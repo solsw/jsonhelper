@@ -7,78 +7,7 @@ import (
 	"testing"
 )
 
-func TestMarshalIndentStr(t *testing.T) {
-	type args struct {
-		v      any
-		prefix string
-		indent string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    string
-		wantErr bool
-	}{
-		{name: "1",
-			args: args{
-				v:      complex(1.2, 3.4),
-				prefix: "",
-				indent: "  ",
-			},
-			wantErr: true,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := MarshalIndentStr(tt.args.v, tt.args.prefix, tt.args.indent)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("MarshalIndentStr() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if got != tt.want {
-				t.Errorf("MarshalIndentStr() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestMarshalIndentStrMust(t *testing.T) {
-	type is struct {
-		I int
-		S string
-	}
-	type args struct {
-		v      any
-		prefix string
-		indent string
-	}
-	tests := []struct {
-		name string
-		args args
-		want string
-	}{
-		{name: "1",
-			args: args{
-				v:      is{1, "one"},
-				prefix: "",
-				indent: "  ",
-			},
-			want: `{
-  "I": 1,
-  "S": "one"
-}`,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := MarshalIndentStrMust(tt.args.v, tt.args.prefix, tt.args.indent); got != tt.want {
-				t.Errorf("MarshalIndentStrMust() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestFormat(t *testing.T) {
+func TestIndentRW(t *testing.T) {
 	type args struct {
 		r      io.Reader
 		prefix string
@@ -126,18 +55,18 @@ func TestFormat(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			w := &bytes.Buffer{}
-			if err := Format(tt.args.r, w, tt.args.prefix, tt.args.indent); (err != nil) != tt.wantErr {
-				t.Errorf("Format() error = %v, wantErr %v", err, tt.wantErr)
+			if err := IndentRW(tt.args.r, w, tt.args.prefix, tt.args.indent); (err != nil) != tt.wantErr {
+				t.Errorf("IndentRW() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got := w.String(); got != tt.want {
-				t.Errorf("Format() = %v, want %v", got, tt.want)
+				t.Errorf("IndentRW() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestFormatStrMust(t *testing.T) {
+func TestIndentStr(t *testing.T) {
 	type args struct {
 		json   string
 		prefix string
@@ -159,8 +88,8 @@ func TestFormatStrMust(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := FormatStrMust(tt.args.json, tt.args.prefix, tt.args.indent); got != tt.want {
-				t.Errorf("FormatStrMust() = %v, want %v", got, tt.want)
+			if got, _ := IndentStr(tt.args.json, tt.args.prefix, tt.args.indent); got != tt.want {
+				t.Errorf("IndentStr() = %v, want %v", got, tt.want)
 			}
 		})
 	}

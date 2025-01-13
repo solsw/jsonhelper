@@ -33,7 +33,7 @@ func TestIndentRW(t *testing.T) {
 				prefix: "",
 				indent: "  ",
 			},
-			want: "{\n  \"i\": 1,\n  \"s\": \"string\"\n}\n",
+			want: "{\n  \"i\": 1,\n  \"s\": \"string\"\n}",
 		},
 		{name: "2",
 			args: args{
@@ -41,7 +41,7 @@ func TestIndentRW(t *testing.T) {
 				prefix: "",
 				indent: "  ",
 			},
-			want: "[\n  {\n    \"i\": 1,\n    \"s\": \"one\"\n  }\n]\n",
+			want: "[\n  {\n    \"i\": 1,\n    \"s\": \"one\"\n  }\n]",
 		},
 		{name: "3",
 			args: args{
@@ -49,7 +49,7 @@ func TestIndentRW(t *testing.T) {
 				prefix: "",
 				indent: "  ",
 			},
-			want: "[\n  {\n    \"i\": 1,\n    \"s\": \"one\"\n  },\n  {\n    \"i\": 2,\n    \"s\": \"two\"\n  }\n]\n",
+			want: "[\n  {\n    \"i\": 1,\n    \"s\": \"one\"\n  },\n  {\n    \"i\": 2,\n    \"s\": \"two\"\n  }\n]",
 		},
 	}
 	for _, tt := range tests {
@@ -68,7 +68,7 @@ func TestIndentRW(t *testing.T) {
 
 func TestIndentStr(t *testing.T) {
 	type args struct {
-		json   string
+		j      string
 		prefix string
 		indent string
 	}
@@ -79,17 +79,56 @@ func TestIndentStr(t *testing.T) {
 	}{
 		{name: "1",
 			args: args{
-				json:   `{"i":1,"s":"string"}`,
+				j:      `{"i":1,"s":"string"}`,
 				prefix: "",
 				indent: "  ",
 			},
-			want: "{\n  \"i\": 1,\n  \"s\": \"string\"\n}\n",
+			want: "{\n  \"i\": 1,\n  \"s\": \"string\"\n}",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := IndentStr(tt.args.json, tt.args.prefix, tt.args.indent); got != tt.want {
+			got, _ := IndentStr(tt.args.j, tt.args.prefix, tt.args.indent)
+			if got != tt.want {
 				t.Errorf("IndentStr() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestIndentAny(t *testing.T) {
+	type args struct {
+		v      any
+		prefix string
+		indent string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    string
+		wantErr bool
+	}{
+		{name: "1",
+			args: args{
+				v: struct {
+					I int    `json:"i"`
+					S string `json:"s"`
+				}{I: 1, S: "string"},
+				prefix: "",
+				indent: "  ",
+			},
+			want: "{\n  \"i\": 1,\n  \"s\": \"string\"\n}",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := IndentAny(tt.args.v, tt.args.prefix, tt.args.indent)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("IndentAny() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("IndentAny() = %v, want %v", got, tt.want)
 			}
 		})
 	}

@@ -29,11 +29,11 @@ func TestIndentRW(t *testing.T) {
 		},
 		{name: "1",
 			args: args{
-				r:      strings.NewReader(`{"i":1,"s":"string"}`),
+				r:      strings.NewReader(`{"i":1,"s":"one"}`),
 				prefix: "",
 				indent: "  ",
 			},
-			want: "{\n  \"i\": 1,\n  \"s\": \"string\"\n}",
+			want: "{\n  \"i\": 1,\n  \"s\": \"one\"\n}",
 		},
 		{name: "2",
 			args: args{
@@ -79,11 +79,11 @@ func TestIndentStr(t *testing.T) {
 	}{
 		{name: "1",
 			args: args{
-				j:      `{"i":1,"s":"string"}`,
+				j:      `{"i":1,"s":"one"}`,
 				prefix: "",
 				indent: "  ",
 			},
-			want: "{\n  \"i\": 1,\n  \"s\": \"string\"\n}",
+			want: "{\n  \"i\": 1,\n  \"s\": \"one\"\n}",
 		},
 	}
 	for _, tt := range tests {
@@ -91,6 +91,32 @@ func TestIndentStr(t *testing.T) {
 			got, _ := IndentStr(tt.args.j, tt.args.prefix, tt.args.indent)
 			if got != tt.want {
 				t.Errorf("IndentStr() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestDefaultStr(t *testing.T) {
+	type args struct {
+		j string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{name: "1",
+			args: args{
+				j: `{"i":1,"s":"one"}`,
+			},
+			want: "{\n    \"i\": 1,\n    \"s\": \"one\"\n}",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, _ := DefaultStr(tt.args.j)
+			if got != tt.want {
+				t.Errorf("DefaultStr() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -113,11 +139,11 @@ func TestIndentAny(t *testing.T) {
 				v: struct {
 					I int    `json:"i"`
 					S string `json:"s"`
-				}{I: 1, S: "string"},
+				}{I: 1, S: "one"},
 				prefix: "",
 				indent: "  ",
 			},
-			want: "{\n  \"i\": 1,\n  \"s\": \"string\"\n}",
+			want: "{\n  \"i\": 1,\n  \"s\": \"one\"\n}",
 		},
 	}
 	for _, tt := range tests {
@@ -129,6 +155,35 @@ func TestIndentAny(t *testing.T) {
 			}
 			if got != tt.want {
 				t.Errorf("IndentAny() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestDefaultAny(t *testing.T) {
+	type args struct {
+		v any
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{name: "1",
+			args: args{
+				v: struct {
+					I int    `json:"i"`
+					S string `json:"s"`
+				}{I: 1, S: "one"},
+			},
+			want: "{\n    \"i\": 1,\n    \"s\": \"one\"\n}",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, _ := DefaultAny(tt.args.v)
+			if got != tt.want {
+				t.Errorf("DefaultAny() = %v, want %v", got, tt.want)
 			}
 		})
 	}

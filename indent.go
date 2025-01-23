@@ -34,6 +34,12 @@ func IndentStr(j, prefix, indent string) (string, error) {
 	return buf.String(), nil
 }
 
+// DefaultStr returns the default indented form of JSON string 'j'.
+func DefaultStr(j string) (string, error) {
+	// https://docs.openstack.org/doc-contrib-guide/json-conv.html
+	return IndentStr(j, "", "    ")
+}
+
 // IndentAny returns the indented JSON encoding of 'v' as string.
 // (See [json.Indent] for 'prefix' and 'indent' usage.)
 func IndentAny(v any, prefix, indent string) (string, error) {
@@ -42,4 +48,10 @@ func IndentAny(v any, prefix, indent string) (string, error) {
 		return "", err
 	}
 	return string(bb), nil
+}
+
+// DefaultAny returns the default indented JSON encoding of 'v' as string.
+func DefaultAny(v any) (string, error) {
+	// https://docs.openstack.org/doc-contrib-guide/json-conv.html
+	return IndentAny(v, "", "    ")
 }

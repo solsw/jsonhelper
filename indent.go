@@ -6,7 +6,7 @@ import (
 	"io"
 )
 
-// IndentRW reads JSON data from [io.Reader] and writes indented data to [io.Writer].
+// IndentRW reads JSON data from [io.Reader] and writes indented JSON data to [io.Writer].
 // (See [json.Indent] for 'prefix' and 'indent' usage.)
 func IndentRW(r io.Reader, w io.Writer, prefix, indent string) error {
 	bb, err := io.ReadAll(r)
@@ -22,6 +22,12 @@ func IndentRW(r io.Reader, w io.Writer, prefix, indent string) error {
 		return err
 	}
 	return nil
+}
+
+// DefaultRW reads JSON data from [io.Reader] and writes default indented JSON data to [io.Writer].
+func DefaultRW(r io.Reader, w io.Writer) error {
+	// https://docs.openstack.org/doc-contrib-guide/json-conv.html
+	return IndentRW(r, w, "", "    ")
 }
 
 // IndentStr returns the indented form of JSON string 'j'.
